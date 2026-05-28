@@ -1,0 +1,757 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>브랜드몰 광고지원금 리그 분석 | 2025 1~4월</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Barlow:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #151820;
+    --surface2: #1c2030;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --accent: #3b82f6;
+    --accent2: #06b6d4;
+    --gold: #f59e0b;
+    --silver: #94a3b8;
+    --bronze: #cd7c3a;
+    --green: #10b981;
+    --red: #ef4444;
+    --purple: #8b5cf6;
+    --m1: #3b82f6;
+    --m2: #10b981;
+    --m3: #f59e0b;
+    --m4: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, #0d0f14 0%, #131826 50%, #0d1220 100%);
+    border-bottom: 1px solid var(--border2);
+    padding: 2rem 0 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-badge {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 800; font-size: 16px;
+    color: white;
+  }
+  .logo-text { font-size: 15px; font-weight: 700; color: var(--text); }
+  .logo-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .header-meta {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--muted);
+    background: var(--surface2);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+  .header-meta .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+  /* Layout */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  /* KPI Cards */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 2rem;
+  }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .kpi-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .kpi-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .kpi-card.blue::before { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .kpi-card.gold::before { background: linear-gradient(90deg, var(--gold), #fbbf24); }
+  .kpi-card.green::before { background: linear-gradient(90deg, var(--green), #34d399); }
+  .kpi-card.purple::before { background: linear-gradient(90deg, var(--purple), #a78bfa); }
+  .kpi-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .kpi-value { font-family: 'Barlow', sans-serif; font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; }
+  .kpi-value.sm { font-size: 18px; padding-top: 4px; }
+  .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+  /* Tabs */
+  .tab-nav {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 1.5rem;
+    width: fit-content;
+  }
+  .tab-btn {
+    padding: 8px 20px;
+    border-radius: 7px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border2);
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Grid layouts */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .col-6040 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+
+  /* Panel */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+  }
+  .panel-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel-title .icon {
+    width: 20px; height: 20px;
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+  }
+
+  /* Rank List */
+  .rank-list { list-style: none; }
+  .rank-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-row:hover { background: var(--surface2); margin: 0 -1.5rem; padding: 7px 1.5rem; border-radius: 6px; }
+  .rnum {
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    min-width: 26px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .rnum.g { color: var(--gold); }
+  .rnum.s { color: var(--silver); }
+  .rnum.b { color: var(--bronze); }
+  .rname {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .rbar-wrap {
+    width: 80px; height: 4px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 2px; overflow: hidden;
+    flex-shrink: 0;
+  }
+  .rbar { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+  .rval {
+    font-family: 'Barlow', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    min-width: 62px;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* Month dots */
+  .month-legend {
+    display: flex; gap: 14px;
+    font-size: 11px; color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .month-legend span { display: flex; align-items: center; gap: 5px; }
+  .mdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Support badges */
+  .sup-months { display: flex; gap: 3px; }
+  .sup-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .sup-dot.empty { background: var(--surface2); border: 1px solid var(--border2); }
+  .sup-amt {
+    font-family: 'Barlow', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .s4 { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .s25 { background: rgba(16,185,129,0.15); color: #34d399; }
+  .s15 { background: rgba(59,130,246,0.15); color: #93c5fd; }
+  .s10 { background: rgba(139,92,246,0.15); color: #c4b5fd; }
+  .total-sup {
+    font-family: 'Barlow', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    min-width: 56px;
+    text-align: right;
+  }
+
+  /* Chart */
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* Confidential tag */
+  .conf-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(239,68,68,0.12);
+    color: #f87171;
+    border: 1px solid rgba(239,68,68,0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+
+  @media (max-width: 900px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .col-6040 { grid-template-columns: 1fr; }
+    main { padding: 1rem; }
+  }
+  @media (max-width: 500px) {
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .tab-btn { padding: 7px 12px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-badge">BM</div>
+      <div>
+        <div class="logo-text">브랜드몰 광고지원금 리그</div>
+        <div class="logo-sub">2025년 1월 ~ 4월 종합 분석</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <span class="dot"></span>
+      참여 대리점 48개사 &nbsp;·&nbsp; 4개월 집계
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- KPI -->
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-label">종합 매출 1위</div>
+      <div class="kpi-value sm">(주)드림패키지</div>
+      <div class="kpi-sub">25.2억원 · PH06484</div>
+    </div>
+    <div class="kpi-card gold">
+      <div class="kpi-label">4개월 연속 광고비 1위</div>
+      <div class="kpi-value sm">하나샘투어</div>
+      <div class="kpi-sub">평균 순위 1.0위</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">4개월 연속 선정</div>
+      <div class="kpi-value">12개사</div>
+      <div class="kpi-sub">최다 수령 · 드림패키지 1,600만원</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">총 참여 대리점</div>
+      <div class="kpi-value">48개사</div>
+      <div class="kpi-sub">전 기간 종합 집계</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="setTab('sales')">📊 매출 순위</button>
+    <button class="tab-btn" onclick="setTab('ad')">📣 광고비 순위</button>
+    <button class="tab-btn" onclick="setTab('support')">🏆 지원금 선정</button>
+  </div>
+
+  <!-- === TAB: SALES === -->
+  <div id="tab-sales" class="tab-content active">
+    <div class="col-6040">
+      <div class="panel">
+        <div class="panel-title">
+          <div class="icon" style="background:rgba(59,130,246,0.15); color:var(--accent);">↑</div>
+          1~4월 종합 매출 순위 (Top 25)
+        </div>
+        <ul class="rank-list" id="sales-list"></ul>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div class="panel">
+          <div class="panel-title">
+            <div class="icon" style="background:rgba(16,185,129,0.15); color:var(--green);">≡</div>
+            월별 순위 변동 (Top 10)
+          </div>
+          <div class="month-legend">
+            <span><span class="mdot" style="background:var(--m1)"></span>1월</span>
+            <span><span class="mdot" style="background:var(--m2)"></span>2월</span>
+            <span><span class="mdot" style="background:var(--m3)"></span>3월</span>
+            <span><span class="mdot" style="background:var(--m4)"></span>4월</span>
+          </div>
+          <div class="chart-wrap" style="height:320px;">
+            <canvas id="salesRankChart" role="img" aria-label="Top 10 대리점 월별 매출 순위 변동">월별 매출 순위 변동 데이터</canvas>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">
+            <div class="icon" style="background:rgba(245,158,11,0.15); color:var(--gold);">$</div>
+            월별 매출 합계 추이
+          </div>
+          <div class="chart-wrap" style="height:160px;">
+            <canvas id="salesTotalChart" role="img" aria-label="월별 총 매출 추이">월별 총 매출 데이터</canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === TAB: AD === -->
+  <div id="tab-ad" class="tab-content">
+    <div class="col-6040">
+      <div class="panel">
+        <div class="panel-title">
+          <div class="icon" style="background:rgba(139,92,246,0.15); color:var(--purple);">♦</div>
+          1~4월 광고비 순위 (평균 순위 기준, Top 25)
+          &nbsp;<span class="conf-tag">⚠ 금액 대외비</span>
+        </div>
+        <ul class="rank-list" id="ad-list"></ul>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div class="panel">
+          <div class="panel-title">
+            <div class="icon" style="background:rgba(6,182,212,0.15); color:var(--accent2);">▲</div>
+            월별 광고비 순위 변동 (Top 10)
+          </div>
+          <div class="month-legend">
+            <span><span class="mdot" style="background:var(--m1)"></span>1월</span>
+            <span><span class="mdot" style="background:var(--m2)"></span>2월</span>
+            <span><span class="mdot" style="background:var(--m3)"></span>3월</span>
+            <span><span class="mdot" style="background:var(--m4)"></span>4월</span>
+          </div>
+          <div class="chart-wrap" style="height:320px;">
+            <canvas id="adRankChart" role="img" aria-label="Top 10 광고비 순위 변동">광고비 순위 변동 데이터</canvas>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title" style="margin-bottom:6px;">
+            <div class="icon" style="background:rgba(139,92,246,0.15); color:var(--purple);">i</div>
+            순위 산정 방식
+          </div>
+          <p style="font-size:12px; color:var(--muted); line-height:1.8;">
+            광고비 금액은 대외비로 노출하지 않습니다.<br>
+            종합 순위는 <strong style="color:var(--text);">4개월 평균 순위</strong>를 기준으로 산정하며,
+            평균 순위가 낮을수록 상위 랭크입니다.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === TAB: SUPPORT === -->
+  <div id="tab-support" class="tab-content">
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-title">
+          <div class="icon" style="background:rgba(245,158,11,0.15); color:var(--gold);">★</div>
+          지원금 선정 대리점 전체
+        </div>
+        <div class="month-legend" style="margin-bottom:8px;">
+          <span><span class="mdot" style="background:var(--m1)"></span>1월</span>
+          <span><span class="mdot" style="background:var(--m2)"></span>2월</span>
+          <span><span class="mdot" style="background:var(--m3)"></span>3월</span>
+          <span><span class="mdot" style="background:var(--m4)"></span>4월</span>
+          <span style="margin-left:6px; padding-left:10px; border-left:1px solid var(--border);">
+            <span class="sup-amt s4">400만</span>
+            <span class="sup-amt s25">250만</span>
+            <span class="sup-amt s15">150만</span>
+            <span class="sup-amt s10">100만</span>
+          </span>
+        </div>
+        <ul class="rank-list" id="support-list"></ul>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div class="panel">
+          <div class="panel-title">
+            <div class="icon" style="background:rgba(16,185,129,0.15); color:var(--green);">≡</div>
+            대리점별 누적 지원금 (Top 15)
+          </div>
+          <div class="chart-wrap" style="height:360px;">
+            <canvas id="supportBarChart" role="img" aria-label="대리점별 누적 지원금 현황">지원금 현황 데이터</canvas>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">
+            <div class="icon" style="background:rgba(59,130,246,0.15); color:var(--accent);">○</div>
+            월별 지원금 규모 분포
+          </div>
+          <div class="chart-wrap" style="height:180px;">
+            <canvas id="supportPieChart" role="img" aria-label="월별 지원금 분포">월별 지원금 분포 데이터</canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  브랜드몰 광고지원금 리그 분석 · 2025년 1~4월 · 내부 대외비 자료 — 광고비 금액 미공개
+</footer>
+
+<script>
+const salesData = [
+  {name:'(주)드림패키지', code:'PH06484', sales:2515926698, m:[2,1,2,2]},
+  {name:'세주여행사', code:'A3595', sales:2357179133, m:[1,2,3,7]},
+  {name:'오리엔탈[이마트 명일점]', code:'A9F92', sales:1787084119, m:[4,5,1,3]},
+  {name:'케이에이피투어', code:'A9K5V', sales:1727893529, m:[5,3,4,4]},
+  {name:'하나글로벌', code:'PH02692', sales:1618809738, m:[3,9,12,1]},
+  {name:'스카이투어[경산점]', code:'A9I58', sales:1472601541, m:[10,7,5,8]},
+  {name:'컨텐츠월드(주)', code:'A9KI7', sales:1375052503, m:[9,11,13,5]},
+  {name:'트래블하나', code:'A9N1T', sales:1322409941, m:[11,6,18,9]},
+  {name:'나이스하나', code:'A9EDC', sales:1321228967, m:[6,13,10,14]},
+  {name:'(주)리컴퍼니', code:'PH04111', sales:1315893046, m:[8,8,14,12]},
+  {name:'DO DREAM[문현점]', code:'A9N46', sales:1260823760, m:[12,12,20,6]},
+  {name:'여행플래너[중동점]', code:'PH05074', sales:1154007891, m:[16,4,16,22]},
+  {name:'나침반여행사[울산동구]', code:'A9I2T', sales:1139496596, m:[19,14,8,11]},
+  {name:'유매인터내셔널', code:'A9ESY', sales:1091389164, m:[20,18,9,10]},
+  {name:'황금여행사', code:'A9NSJ', sales:1092234664, m:[21,15,21,32]},
+  {name:'하나이엔비티', code:'A9MLX', sales:1077875092, m:[5,19,19,15]},
+  {name:'투어몬', code:'PH02576', sales:997996826, m:[18,16,22,18]},
+  {name:'트립나우', code:'PH03529', sales:995879276, m:[30,32,11,17]},
+  {name:'여행의달인', code:'A9MSU', sales:856896401, m:[24,35,7,16]},
+  {name:'새서울여행사', code:'A0865', sales:845085584, m:[14,20,26,39]},
+  {name:'하나팩닷컴(주)', code:'A9ATJ', sales:831992460, m:[28,28,39,24]},
+  {name:'여행닷컴', code:'A9NQG', sales:756879075, m:[29,24,32,30]},
+  {name:'주식회사 비타투어', code:'PH03515', sales:912539971, m:[13,22,15,29]},
+  {name:'트립페이지', code:'PH05117', sales:844842062, m:[18,10,36,42]},
+  {name:'하나샘투어', code:'A9JYW', sales:662264602, m:[37,39,27,13]},
+];
+
+const adData = [
+  {name:'하나샘투어', code:'A9JYW', avgRank:1.0, m:[1,1,1,1]},
+  {name:'드림패키지', code:'PH06484', avgRank:2.75, m:[5,2,2,2]},
+  {name:'오리엔탈[이마트 명일점]', code:'A9F92', avgRank:3.25, m:[2,5,3,3]},
+  {name:'하나글로벌', code:'PH02692', avgRank:4.75, m:[4,3,5,7]},
+  {name:'유매인터내셔널', code:'A9ESY', avgRank:7.0, m:[8,10,6,4]},
+  {name:'(주)리컴퍼니', code:'PH04111', avgRank:7.0, m:[10,8,4,6]},
+  {name:'나침반여행사[울산동구]', code:'A9I2T', avgRank:8.25, m:[7,12,9,5]},
+  {name:'세주여행사', code:'A3595', avgRank:8.5, m:[3,4,10,17]},
+  {name:'컨텐츠월드(주)', code:'A9KI7', avgRank:9.0, m:[9,6,12,9]},
+  {name:'나이스하나', code:'A9EDC', avgRank:11.0, m:[6,17,13,8]},
+  {name:'스카이투어[경산점]', code:'A9I58', avgRank:12.0, m:[15,14,8,10]},
+  {name:'황금여행사', code:'A9NSJ', avgRank:15.75, m:[13,9,25,36]},
+  {name:'케이에이피투어', code:'A9K5V', avgRank:15.0, m:[12,11,31,42]},
+  {name:'여행플래너[중동점]', code:'PH05074', avgRank:17.0, m:[19,22,11,16]},
+  {name:'투어몬', code:'PH02576', avgRank:16.5, m:[23,13,7,13]},
+  {name:'여행문화', code:'A1122', avgRank:17.5, m:[11,15,20,11]},
+  {name:'여행의달인', code:'A9MSU', avgRank:17.75, m:[17,16,16,12]},
+  {name:'하나팩닷컴(주)', code:'A9ATJ', avgRank:19.5, m:[29,19,17,20]},
+  {name:'도도투어[세종점]', code:'A9KZI', avgRank:24.0, m:[24,23,39,45]},
+  {name:'투어라운지[천안]', code:'PH03474', avgRank:22.5, m:[34,30,26,24]},
+  {name:'트립페이지', code:'PH05117', avgRank:22.75, m:[20,29,36,25]},
+  {name:'퍼즐여행', code:'A9LNN', avgRank:22.5, m:[22,24,41,18]},
+  {name:'유닉투어', code:'A9KJL', avgRank:24.0, m:[16,20,19,48]},
+  {name:'나우여행', code:'PH01593', avgRank:24.75, m:[39,25,33,29]},
+  {name:'리더투어', code:'A9A8X', avgRank:24.5, m:[25,28,23,19]},
+];
+
+const supportData = [
+  {name:'드림패키지', months:['1월','2월','3월','4월'], supports:[4000000,4000000,4000000,4000000], total:16000000},
+  {name:'하나샘투어', months:['1월','2월','3월','4월'], supports:[4000000,4000000,4000000,2500000], total:14500000},
+  {name:'세주여행사', months:['1월','2월','3월','4월'], supports:[4000000,4000000,4000000,1500000], total:13500000},
+  {name:'하나글로벌', months:['1월','2월','3월','4월'], supports:[2500000,2500000,2500000,4000000], total:11500000},
+  {name:'오리엔탈[이마트 명일점]', months:['1월','2월','3월','4월'], supports:[2500000,2500000,4000000,2500000], total:11500000},
+  {name:'(주)리컴퍼니', months:['1월','2월','3월','4월'], supports:[2500000,2500000,2500000,2500000], total:10000000},
+  {name:'나이스하나', months:['1월','2월','3월','4월'], supports:[2500000,1000000,1500000,2500000], total:7500000},
+  {name:'컨텐츠월드(주)', months:['1월','2월','3월','4월'], supports:[2500000,2500000,1000000,1500000], total:7500000},
+  {name:'스카이투어[경산점]', months:['1월','2월','3월','4월'], supports:[1500000,1500000,2500000,1500000], total:7000000},
+  {name:'나침반여행사', months:['1월','2월','3월','4월'], supports:[1500000,1500000,2500000,1500000], total:7000000},
+  {name:'유매인터내셔널', months:['1월','2월','3월','4월'], supports:[1000000,1000000,2500000,2500000], total:7000000},
+  {name:'케이에이피투어', months:['1월','2월','3월','4월'], supports:[1500000,2500000,1500000,1000000], total:6500000},
+  {name:'투어몬', months:['2월','3월','4월'], supports:[1000000,1000000,1000000], total:3000000},
+  {name:'여행의달인', months:['3월','4월'], supports:[1000000,1500000], total:2500000},
+  {name:'DO DREAM', months:['1월','4월'], supports:[1000000,1000000], total:2000000},
+  {name:'하나이엔비티', months:['1월'], supports:[1500000], total:1500000},
+  {name:'황금여행사', months:['2월'], supports:[1500000], total:1500000},
+  {name:'여행플래너[중동점]', months:['2월'], supports:[1500000], total:1500000},
+  {name:'유닉투어', months:['3월'], supports:[1500000], total:1500000},
+  {name:'주식회사 비타투어', months:['1월'], supports:[1000000], total:1000000},
+];
+
+const MONTHS4 = ['1월','2월','3월','4월'];
+const M_COLORS = ['#3b82f6','#10b981','#f59e0b','#ef4444'];
+
+function fmtSales(v) {
+  if(v >= 1e9) return (v/1e8).toFixed(1) + '억';
+  if(v >= 1e7) return (v/1e4).toFixed(0) + '만';
+  return v.toLocaleString();
+}
+
+function rankNum(i, cls='') {
+  const r = i+1;
+  const extra = r===1 ? 'g' : r===2 ? 's' : r===3 ? 'b' : '';
+  return `<span class="rnum ${extra} ${cls}">${r}</span>`;
+}
+
+// Sales list
+const salesMax = salesData[0].sales;
+const sl = document.getElementById('sales-list');
+salesData.slice(0,25).forEach((d,i) => {
+  const pct = Math.round(d.sales/salesMax*100);
+  const barColor = i<3 ? ['#3b82f6','#10b981','#f59e0b'][i] : '#4b5563';
+  sl.innerHTML += `<li class="rank-row">${rankNum(i)}<span class="rname">${d.name}</span><div class="rbar-wrap"><div class="rbar" style="width:${pct}%;background:${barColor}"></div></div><span class="rval">${fmtSales(d.sales)}</span></li>`;
+});
+
+// Ad list
+const al = document.getElementById('ad-list');
+adData.slice(0,25).forEach((d,i) => {
+  const pct = Math.max(5, Math.round((1-(d.avgRank-1)/35)*100));
+  const barColor = i<3 ? ['#8b5cf6','#06b6d4','#f59e0b'][i] : '#4b5563';
+  al.innerHTML += `<li class="rank-row">${rankNum(i)}<span class="rname">${d.name}</span><div class="rbar-wrap"><div class="rbar" style="width:${pct}%;background:${barColor}"></div></div><span class="rval">평균 ${d.avgRank}위</span></li>`;
+});
+
+// Support list
+function amtBadge(amt) {
+  if(!amt) return '';
+  if(amt>=4000000) return `<span class="sup-amt s4">400만</span>`;
+  if(amt>=2500000) return `<span class="sup-amt s25">250만</span>`;
+  if(amt>=1500000) return `<span class="sup-amt s15">150만</span>`;
+  return `<span class="sup-amt s10">100만</span>`;
+}
+const sp = document.getElementById('support-list');
+supportData.forEach((d,i) => {
+  const dots = MONTHS4.map((m,mi) => {
+    const idx = d.months.indexOf(m);
+    if(idx>=0) return `<span class="sup-dot" style="background:${M_COLORS[mi]}" title="${m} ${(d.supports[idx]/10000).toFixed(0)}만원"></span>`;
+    return `<span class="sup-dot empty"></span>`;
+  }).join('');
+  const latest = d.supports[d.supports.length-1];
+  sp.innerHTML += `<li class="rank-row"><span style="font-size:12px;color:var(--muted);min-width:22px;text-align:center;">${i+1}</span><span class="rname">${d.name}</span><div class="sup-months">${dots}</div>${amtBadge(latest)}<span class="total-sup">${(d.total/10000).toFixed(0)}만원</span></li>`;
+});
+
+// CHARTS
+const chartDefaults = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+};
+
+// Sales rank chart (bar grouped by month)
+const top10s = salesData.slice(0,10);
+new Chart(document.getElementById('salesRankChart'), {
+  type: 'bar',
+  data: {
+    labels: top10s.map(d => d.name.length>8 ? d.name.slice(0,8)+'…' : d.name),
+    datasets: MONTHS4.map((m,mi) => ({
+      label: m, data: top10s.map(d => d.m[mi]),
+      backgroundColor: M_COLORS[mi]+'BB', borderRadius: 4, borderSkipped: false,
+    }))
+  },
+  options: {
+    ...chartDefaults,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw}위` } } },
+    scales: {
+      y: { reverse: true, min:1, ticks:{color:'#6b7280',font:{size:11}}, grid:{color:'rgba(255,255,255,0.05)'}, title:{display:true,text:'순위',color:'#6b7280',font:{size:11}} },
+      x: { ticks:{color:'#6b7280',font:{size:11},maxRotation:30}, grid:{display:false} }
+    }
+  }
+});
+
+// Sales total by month
+new Chart(document.getElementById('salesTotalChart'), {
+  type: 'bar',
+  data: {
+    labels: MONTHS4,
+    datasets: [{
+      label: '총 매출',
+      data: [13516641846, 13004909327, 7480728603, 9263357561],
+      backgroundColor: M_COLORS.map(c => c+'BB'),
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    ...chartDefaults,
+    plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: ctx => `${(ctx.raw/1e8).toFixed(1)}억원` } } },
+    scales: {
+      y: { ticks:{color:'#6b7280',font:{size:10}, callback: v=>(v/1e8).toFixed(0)+'억'}, grid:{color:'rgba(255,255,255,0.05)'} },
+      x: { ticks:{color:'#6b7280',font:{size:11}}, grid:{display:false} }
+    }
+  }
+});
+
+// Ad rank chart
+const top10a = adData.slice(0,10);
+new Chart(document.getElementById('adRankChart'), {
+  type: 'bar',
+  data: {
+    labels: top10a.map(d => d.name.length>8 ? d.name.slice(0,8)+'…' : d.name),
+    datasets: MONTHS4.map((m,mi) => ({
+      label: m, data: top10a.map(d => d.m[mi]),
+      backgroundColor: M_COLORS[mi]+'BB', borderRadius: 4, borderSkipped: false,
+    }))
+  },
+  options: {
+    ...chartDefaults,
+    plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: ctx => `${ctx.dataset.label}: ${ctx.raw}위` } } },
+    scales: {
+      y: { reverse:true, min:1, ticks:{color:'#6b7280',font:{size:11}}, grid:{color:'rgba(255,255,255,0.05)'}, title:{display:true,text:'순위',color:'#6b7280',font:{size:11}} },
+      x: { ticks:{color:'#6b7280',font:{size:11},maxRotation:30}, grid:{display:false} }
+    }
+  }
+});
+
+// Support horizontal bar
+const top15sup = supportData.slice(0,15);
+new Chart(document.getElementById('supportBarChart'), {
+  type: 'bar',
+  data: {
+    labels: top15sup.map(d => d.name.length>8 ? d.name.slice(0,8)+'…' : d.name),
+    datasets: MONTHS4.map((m,mi) => ({
+      label: m,
+      data: top15sup.map(d => { const idx=d.months.indexOf(m); return idx>=0 ? d.supports[idx]/10000 : 0; }),
+      backgroundColor: M_COLORS[mi]+'BB',
+      borderRadius: 3,
+    }))
+  },
+  options: {
+    ...chartDefaults,
+    indexAxis: 'y',
+    plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: ctx => `${ctx.dataset.label}: ${ctx.raw}만원` } } },
+    scales: {
+      x: { stacked:true, ticks:{color:'#6b7280',font:{size:10}, callback: v=>v+'만'}, grid:{color:'rgba(255,255,255,0.05)'} },
+      y: { stacked:true, ticks:{color:'#9ca3af',font:{size:11}}, grid:{display:false} }
+    }
+  }
+});
+
+// Support pie (by month)
+const supByMonth = MONTHS4.map(m => supportData.reduce((sum,d) => {
+  const idx = d.months.indexOf(m);
+  return sum + (idx>=0 ? d.supports[idx] : 0);
+}, 0));
+new Chart(document.getElementById('supportPieChart'), {
+  type: 'doughnut',
+  data: {
+    labels: MONTHS4,
+    datasets: [{ data: supByMonth.map(v=>v/10000), backgroundColor: M_COLORS.map(c=>c+'CC'), borderWidth: 0, hoverOffset: 4 }]
+  },
+  options: {
+    ...chartDefaults,
+    cutout: '60%',
+    plugins: {
+      legend: { display: true, position: 'right', labels: { color: '#9ca3af', font:{size:11}, boxWidth:10 } },
+      tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw}만원` } }
+    }
+  }
+});
+
+// Tab logic
+function setTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector(`[onclick="setTab('${name}')"]`).classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+</script>
+
+</body>
+</html>
